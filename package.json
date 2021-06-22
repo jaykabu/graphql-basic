@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon src/array-type2.js --exec babel-node"
+    "start": "nodemon src/relationData.js --exec babel-node"
   },
   "keywords": [],
   "author": "",
