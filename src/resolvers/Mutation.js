@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
+import Post from "./Post";
 
 const Mutation = {
   createUser: (parent, args, { db }, info) => {
@@ -105,7 +106,7 @@ const Mutation = {
     return post;
   },
 
-  deletePost: (parent, args, { db }, info) => {
+  deletePost: (parent, args, { db, pubsub }, info) => {
     const postIndex = db.posts.findIndex((post) => {
       return post.id === args.id;
     });
@@ -114,14 +115,23 @@ const Mutation = {
       throw new Error("Post not found!");
     }
 
-    const deletePost = db.posts.splice(postIndex, 1);
+    const [post] = db.posts.splice(postIndex, 1);
 
     db.comments = db.comments.filter((comment) => comment.post !== args.id)
 
-    return deletePost[0];
+    if (post.published) {
+      pubsub.publish('post', {
+        post: {
+          mutation: "DELETED",
+          data: post
+        }
+      })
+    }
+
+    return post;
   },
 
-  updatePost: (parent, args, { db }, info) => {
+  updatePost: (parent, args, { db, pubsub }, info) => {
     const { id, data } = args;
     const post = db.posts.find((post) => post.id === args.id);
 
@@ -139,6 +149,9 @@ const Mutation = {
 
     if (typeof data.published === "boolean") {
       post.published = data.published
+
+
+
     }
 
     return post;
