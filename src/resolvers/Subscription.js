@@ -8,7 +8,7 @@ const Subscription = {
         pubsub.publish('count', {
           count
         })
-      }, 2000)
+      }, 2000) 
 
       return pubsub.asyncIterator('count')
     }
